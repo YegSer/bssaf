@@ -1,4 +1,4 @@
-var socket = io.connect('http://localhost:8080');
+var socket = io.connect(window.location.host + '/socket');
 
 function start() {
     console.log('Start game');
