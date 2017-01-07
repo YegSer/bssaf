@@ -30,4 +30,9 @@ function startLoop() {
     setImmediate(loop);
 }
 
+function onConnection(socket) {
+
+}
+
 module.exports.startLoop = startLoop;
+module.exports.onConnection = onConnection;
