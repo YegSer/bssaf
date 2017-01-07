@@ -1,86 +1,54 @@
 var constants = require('../constants');
+var NetworkManager = require('./managers/network.js');
     
-function Game(io) {
-    var self = this;
+class Game {
+    constructor(io) {
+        this.FRAME_LENGTH = 1000.0 / constants.UPS;
 
-    this.FRAME_LENGTH = 1000.0 / constants.UPS;
+        this.io = io.of('/socket');
+        this.network = new NetworkManager(this);
 
-    this.io = io.of('/socket');
-
-    this.lastTick = null;
-    this.connections = [ ];
+        this.lastTick = null;
+        this.onConnection = this.network.onConnection.bind(this.network);
+    }
 
     /**
      * Will be called every time we need to update world
      */
-    this.update = function(delta) {
-        self.io.emit('test');
+    update (delta) {
+        this.io.emit('test');
     }
 
     /**
      * The function calls every tick and when richs delta between frames
      * calls {@link update} function
      */
-    this.loop = function() {
+    loop () {
         var now = Date.now();
-        var delta = now - self.lastTick;
+        var delta = now - this.lastTick;
 
-        if (delta >= self.FRAME_LENGTH) {
-            self.update(delta / 1000);
+        if (delta >= this.FRAME_LENGTH) {
+            this.update(delta / 1000);
             
-            self.lastTick = Date.now();
+            this.lastTick = Date.now();
         }
 
-        // Why `self`?
+        // Why `this`?
         // Because JavaScrit, that's why!
-        if (delta < self.FRAME_LENGTH) {
-            setTimeout(self.loop); // Will be called in next tick of Node.JS loop
+        if (delta < this.FRAME_LENGTH) {
+            setTimeout(this.loop.bind(this)); // Will be called in next tick of Node.JS loop
         } else {
-            setImmediate(self.loop); // Will be calle immediate
+            setImmediate(this.loop.bind(this)); // Will be calle immediate
         }
     }
 
     /**
-     * Statrs game loop
+     * Starts game loop
      */
-    this.startLoop = function() {
-        self.lastTick = Date.now();
+    startLoop () {
+        this.lastTick = Date.now();
 
-        setImmediate(self.loop);
-    }
-
-    /**
-     * Handles login of a user
-     */
-    this.onLogin = function(socket, username) {
-        console.log(username);
-    }
-
-    /**
-     * Event handler util
-     * @param {socket} socket Socket that had event 
-     * @param {string} event Event name to handle
-     * @param {function} foo Callback function
-     */
-    this.use = function(socket, event, foo) {
-        socket.on(event, function() {
-            var args = [].concat.call(arguments);
-            
-            foo.apply(self, [ socket ].concat(args));
-        });
-    }
-
-    /**
-     * Handles connection from socket.io
-     * 
-     * @param {socket} socket Socket we get from socket.io 
-     */
-    this.onConnection = function(socket) {
-        logger.info('New connection from %s.', socket.id);
-        
-        self.use(socket, 'login', self.onLogin);
-
-        self.connections.push(socket);
+        setImmediate(this.loop.bind(this));
     }
 }
 

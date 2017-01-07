@@ -10,7 +10,6 @@ var Game = require('./game/game.js');
 var Log = require('log');
 
 global.logger = new Log('info');
-
 game = new Game(io);
 
 /**

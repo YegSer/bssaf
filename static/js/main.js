@@ -1,5 +1,9 @@
+var game = new Game();
+
 function start() {
-    var game = new Game();
-    
     game.connect(window.location.host + '/socket');
+}
+
+function stop() {
+    game.stop();
 }

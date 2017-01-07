@@ -1,26 +1,38 @@
-function Game() {
-    var self = this; // Because callbacks change context
-    this.socket = null;
+class Game {
+    constructor() {
+        this.socket = null;
+        this.username = Math.random().toString(36).substring(2, 5);
+    }
 
-    this.connected = function() {
+    connected () {
         console.log('Succesfully connected');
         
-        self.socket.emit('login', Math.random().toString(36).substring(2, 5));
+        this.socket.emit('login', this.username);
     }
 
-    this.test = function(delta) {
-        console.log(delta);
+    loginned (res) {
+        if (res) {
+            console.log('Succesfully loginned');
+        } else {
+            console.log('Failed to login.')
+        }
     }
 
-    this.disconnected = function() {
+    stop () {
+        this.socket.disconnect();
+    }
+
+    disconnected () {
         console.log('Disconnected')
     }
 
-    this.connect = function(destination) {
+    connect (destination) {
         console.log(`Connecting to ${destination}...`)
-        self.socket = io.connect(destination);
+        this.socket = io.connect(destination);
         
-        self.socket.on('connect', self.connected);
-        self.socket.on('dsconnect', self.disconnected);
+        this.socket.on('connect', this.connected.bind(this));
+        this.socket.on('dsconnect', this.disconnected.bind(this));
+
+        this.socket.on('loginned', this.loginned.bind(this));
     }
 }
