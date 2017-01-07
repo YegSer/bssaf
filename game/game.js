@@ -50,6 +50,27 @@ function Game(io) {
     }
 
     /**
+     * Handles login of a user
+     */
+    this.onLogin = function(socket, username) {
+        console.log(username);
+    }
+
+    /**
+     * Event handler util
+     * @param {socket} socket Socket that had event 
+     * @param {string} event Event name to handle
+     * @param {function} foo Callback function
+     */
+    this.use = function(socket, event, foo) {
+        socket.on(event, function() {
+            var args = [].concat.call(arguments);
+            
+            foo.apply(self, [ socket ].concat(args));
+        });
+    }
+
+    /**
      * Handles connection from socket.io
      * 
      * @param {socket} socket Socket we get from socket.io 
@@ -57,6 +78,8 @@ function Game(io) {
     this.onConnection = function(socket) {
         logger.info('New connection from %s.', socket.id);
         
+        self.use(socket, 'login', self.onLogin);
+
         self.connections.push(socket);
     }
 }

@@ -5,9 +5,7 @@ function Game() {
     this.connected = function() {
         console.log('Succesfully connected');
         
-        self.socket.on('test', function() {
-            console.log('123');
-        });
+        self.socket.emit('login', Math.random().toString(36).substring(2, 5));
     }
 
     this.test = function(delta) {
