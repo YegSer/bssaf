@@ -12,4 +12,4 @@ function define(name, value) {
 }
 
 define('HTTP_PORT', 8080);
-define('UPS', 30); // Updates per second
+define('UPS', 60); // Updates per second
