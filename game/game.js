@@ -1,5 +1,6 @@
 var constants = require('../constants');
 var NetworkManager = require('./managers/network.js');
+var LogicManager = require('./managers/logic.js');
     
 class Game {
     constructor(io) {
@@ -7,16 +8,24 @@ class Game {
 
         this.io = io.of('/socket');
         this.network = new NetworkManager(this);
+        this.logic = new LogicManager(this);
 
         this.lastTick = null;
         this.onConnection = this.network.onConnection.bind(this.network);
     }
 
+    loginned (connection) {
+        this.logic.playerAdded(connection);
+    }
+
     /**
-     * Will be called every time we need to update world
+     * Will be called every time we need to update world, network and etc
+     * 
+     * @param {number} dt Delta between updates in seconds 
      */
-    update (delta) {
-        this.io.emit('test');
+    update (dt) {
+        this.logic.update(dt);
+        this.network.update(dt);
     }
 
     /**
