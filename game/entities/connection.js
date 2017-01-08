@@ -48,6 +48,7 @@ class Connection {
     onLogin(username) {
         logger.info(`${this.id} loginned with username ${username}`);
 
+        this.username = username;
         this.loginned = true;
 
         this.socket.emit('loginned', true);
