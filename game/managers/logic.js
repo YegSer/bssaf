@@ -33,14 +33,27 @@ class LogicManager {
      */
     update (dt) {
         this.world.step(dt);
+
+        for (let i = 0; i < this.ships.length; i++) {
+            this.ships[i].update();
+        }
     }
 
     /**
      * Get info about world
+     * 
+     * @param {string} socket_id Id of the player to identify
      */
-    getWorldInfo () {
+    getWorldInfo (socket_id) {
+        let ships = [ ];
+        for (let i = 0; i < this.ships.length; ++i) {
+            ships.push(this.ships[i].getSpawnInfo());
+        }
+
         return {
-            gravity: this.world.gravity
+            id: socket_id,
+            gravity: this.world.gravity,
+            ships: ships
         }
     }
 
@@ -50,8 +63,8 @@ class LogicManager {
      * @return {Array<number>} 2 numbers: x and y of position
      */
     getNewPosition() {
-        let x = getRandomInt(-10, 10),
-            y = getRandomInt(-10, 10);
+        let x = getRandomInt(300, 510),
+            y = getRandomInt(300, 510);
 
         return [ x, y ];
     }
@@ -68,6 +81,15 @@ class LogicManager {
         this.ships.push(connection.ship);
 
         this.game.network.shipSpawned(connection.ship);
+    }
+
+    removePlayer (connection) {
+        let ind = this.ships.indexOf(connection.ship);
+        this.world.removeBody(connection.ship.body);
+
+        if (ind >= 0) {
+            this.ships = this.ships.slice(ind, 1);
+        }
     }
 }
 

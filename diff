@@ -19,7 +19,7 @@ class Game extends Phaser.Game {
             preload: this.preload.bind(this),
             create: this.phaserInit.bind(this),
             render: this.render.bind(this),
-            update: this.logicUpdate.bind(this)
+            update: this.update.bind(this)
         }, true);
 
         this.ships = new Map();
@@ -41,13 +41,17 @@ class Game extends Phaser.Game {
         this.connect();
     }
 
-    logicUpdate () {
+    update () {
         if (this.cursors) {
-            this.socket.emit('input', {
-                left: this.cursors.left.isDown,
-                right: this.cursors.right.isDown,
-                push: this.cursors.up.isDown
-            });
+            if (this.cursors.left.isDown) {
+                console.log('left');
+            } else if (this.cursors.right.isDown) {
+                console.log('right');
+            } 
+
+            if (this.cursors.up.isDown) {
+                console.log('push');
+            }
         }
     }
 
@@ -117,20 +121,12 @@ class Game extends Phaser.Game {
         console.log(`Ship ${shipInfo.id} spawned.`)
 
         let ship = this.add.sprite(shipInfo.position[0], shipInfo.position[0], 'ship_default');
-
-        console.log(shipInfo);
-        ship.data = {
-            id: shipInfo.id,
-            username: shipInfo.username,
-            shipType: shipInfo.shipType,
-            speed: 1
-        };
         
         this.physics.p2.enable(ship, this.enableDebug);
         this.ships.set(shipInfo.id, ship);
         
         if (shipInfo.id == this.id) {
-            //this.camera.follow(ship);
+            this.camera.follow(ship);
             this.camera.position = new Phaser.Point(shipInfo.position[0], shipInfo.position[0]);
 
             this.ship = ship;
@@ -157,12 +153,14 @@ class Game extends Phaser.Game {
             if (this.ships.has(ship_info.id)) {
                 var local_ship = this.ships.get(ship_info.id);
 
-                local_ship.body.data.angularVelocity = ship_info.angularVelocity * Math.PI / 180.0;
+                local_ship.body.angularVelocity = ship_info.angularVelocity;
                 local_ship.body.velocity = ship_info.velocity;
 
-                local_ship.body.angle = ship_info.rotation;
+                local_ship.body.angle = ship_info.angle;
                 local_ship.body.x = ship_info.position[0];
                 local_ship.body.y = ship_info.position[1];
+
+                //this.ships.set(ship_info.id, local_ship)
             } else {
                 console.log(`Undefined ship: ${ship_info.id}.`);
             }

@@ -10,14 +10,14 @@ class Connection {
      */
     constructor (network, socket) {
         this.socket = socket;
-        this.network = network;
-        this.game = this.network.game;
+        this.game = network.game;
 
         this.id = socket.id;
         this.username = null;
         this.loginned = false;
 
         this.socket.on('login', this.onLogin.bind(this));
+        this.socket.on('input', this.onInput.bind(this));
         this.socket.on('disconnect', this.onDisconnect.bind(this))
 
         this.ship = null;
@@ -31,11 +31,17 @@ class Connection {
         }
     }
 
+    onInput(input) {
+        if (this.ship) {
+            this.ship.onInput(input);
+        }
+    }
+
     /**
      * Callback for disconnecting
      */
     onDisconnect() {
-        this.network.disconnected(this);
+        this.game.network.disconnected(this);
     }
 
     /**

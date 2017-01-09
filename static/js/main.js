@@ -1,12 +1,13 @@
 let w = window.innerWidth * window.devicePixelRatio,    
     h = window.innerHeight * window.devicePixelRatio;
 
-var game = new Game(w, h);
+var game;
 
 function start() {
-    game.connect(window.location.host + '/socket');
+    game = new Game(w, h, window.location.host + '/socket');
 }
 
-function stop() {
+window.onbeforeunload = function(event) {
     game.stop();
-}
+    return null;
+};

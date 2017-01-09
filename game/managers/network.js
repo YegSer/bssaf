@@ -33,14 +33,17 @@ class NetworkManager {
     }
 
     disconnected (connection) {
+        logger.info(`Player ${connection.id} disconnected...`);
+
         let ind = this.connections.indexOf(connection);
 
+        this.game.logic.removePlayer(connection);
+
         if (ind >= 0) {
-            this.connections.slice(ind, 1);
+            this.connections = this.connections.slice(ind, 1);
         }
 
-        // TODO: Emmit this event to everyone
-        //this.io.emmit('left', connection.id);
+        this.io.emit('user_left', connection.id);
     }
 
     shipSpawned(ship) {
@@ -52,7 +55,7 @@ class NetworkManager {
 
         let connection = new Connection(this, socket);
 
-        socket.emit('world_info', this.game.logic.getWorldInfo());
+        socket.emit('world_info', this.game.logic.getWorldInfo(socket.id));
 
         this.connections.push(connection);
     }
